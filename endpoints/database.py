@@ -9,7 +9,7 @@ async def test():
 
 
 @app.route("/addResponse", methods=["POST"])
-async def addResponse(qid, userID, response, time):
+async def addResponse():
     data = await request.get_json()
 
     try:
