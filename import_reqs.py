@@ -19,6 +19,10 @@ import yaml
 from quart import current_app
 from dotenv import load_dotenv
 
+from firebase_admin.firestore import Query
+from firebase_admin import auth, messaging
+from firebase_admin import credentials, firestore, initialize_app
+
 load_dotenv()
  
 
@@ -34,3 +38,15 @@ with open("config/config.yaml", 'r') as stream:
         config = yaml.safe_load(stream)
     except yaml.YAMLError as exc:
         print(exc)
+
+cred = credentials.Certificate(
+    "config/firebase.json")
+
+default_app = initialize_app(cred)
+db = firestore.client()
+
+#your colletcions here
+QUESTIONS = db.collection("questions")
+# COMMUNICATIONS = db.collection("Communications")
+# AGENTS = db.collection("Agents")
+# FEEDBACK = db.collection("Feedback")

@@ -6,6 +6,7 @@ from core.main import *
 #pass in a parameter that tells it how long to run for in minutes
 @app.route("/timeoutTest", methods=["GET"])
 async def timeoutTest():
+    print("chicken")
     """
     timeoutTest(): The timeoutTest Page for the API
     """
