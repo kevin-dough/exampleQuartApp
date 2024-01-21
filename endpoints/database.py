@@ -8,6 +8,23 @@ async def test():
     return "Hello World"
 
 
+@app.route("/addQuestion", methods=["GET"])
+async def addQuestion():
+    try:
+        Q = generateQuestion()
+        doc_ref = QUESTIONS.document(str(Q[1])).set(
+            {"question": Q[0], "numResponses": 0, "responses": {}})
+        return "success"
+    except Exception as e:
+        print(e)
+        return jsonify(
+            {
+                "success": False,
+                "error": str(e)
+            }
+        ), 500
+
+
 @app.route("/addUser", methods=["POST"])
 async def addUser():
     data = await request.get_json()
@@ -15,7 +32,6 @@ async def addUser():
     try:
         userData = {"username": data["username"],
                     "likesAvailable": data["likesAvailable"]}
-        print(userData)
         doc_ref = USERS.document(data["userID"]).set(userData)
         return "success"
     except Exception as e:

@@ -16,18 +16,57 @@ from quart import Quart, g, jsonify, request, Response, abort, stream_with_conte
 from quart_cors import cors
 import tempfile
 import yaml
+import uuid
 from quart import current_app
 from dotenv import load_dotenv
+from openai import AzureOpenAI
+from newsapi import NewsApiClient
 
 from firebase_admin.firestore import Query
 from firebase_admin import auth, messaging
 from firebase_admin import credentials, firestore, initialize_app
 
 load_dotenv()
- 
+
+
+def generateQuestion():
+
+    newsApi = NewsApiClient(api_key="ad0df79148454c949b6b6f0f51adaadc")
+    azure_gpt35_model = AzureOpenAI(
+        azure_endpoint="https://cerebrus-openai-prod-northus.openai.azure.com/",
+        api_key="3f8729d687644797893788a59bc3e8e7",
+        api_version="2023-07-01-preview",
+    )
+    category = random.choice(["business", "entertainment",
+                              "general", "health", "science", "sports", "technology"])
+    question_type = random.choice(["controversial", "would you rather", ""])
+    headlines = newsApi.get_top_headlines(country="us", category=category)
+    headline = random.choice(headlines["articles"])["title"]
+
+    if (question_type == ""):
+        topic = headline + ". Give a quick background knowledge on the topic."
+    else:
+        topic = "a well known or interesting topic"
+
+    response = azure_gpt35_model.chat.completions.create(
+        model="spooky-main",
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a young ponderous individual who loves to ask" + question_type + "questions. You do not ask too formally. You are not too involved with politics."
+            },
+            {
+                "role": "user",
+                "content": "Generate a short question that sparks debate or discussion about " + topic + ". It should not be a yes or no question."
+            }
+        ],
+    )
+    return [response.choices[0].message.content, uuid.uuid4()]
+
 
 def proxy_post(url, data):
     return requests.post(url, json=data)
+
 
 app = Quart(__name__)
 # Allow localhost:3000 to not get CORS errors
@@ -45,7 +84,7 @@ cred = credentials.Certificate(
 default_app = initialize_app(cred)
 db = firestore.client()
 
-#your colletcions here
+# your colletcions here
 QUESTIONS = db.collection("questions")
 USERS = db.collection("users")
 # COMMUNICATIONS = db.collection("Communications")
