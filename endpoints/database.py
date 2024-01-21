@@ -11,9 +11,8 @@ async def test():
 @app.route("/addResponse", methods=["POST"])
 async def addResponse():
     data = await request.get_json()
-
     try:
-        doc_ref = QUESTIONS.document(qid)
+        doc_ref = QUESTIONS.document(data["qid"])
         doc = doc_ref.get()
         if doc.exists:
             doc = doc.to_dict()

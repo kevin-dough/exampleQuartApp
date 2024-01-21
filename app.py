@@ -2,11 +2,13 @@ from import_reqs import *
 import endpoints.core as core
 import endpoints.database as database
 
-PORT = 7001
+PORT = 7045
+
 
 @app.route("/hello")
 async def database():
     return "Hello World"
+
 
 @app.route("/", methods=["GET"])
 async def home():
@@ -35,4 +37,3 @@ if __name__ == "__main__":
     )
 
     print("Done!")
-
