@@ -47,6 +47,7 @@ db = firestore.client()
 
 #your colletcions here
 QUESTIONS = db.collection("questions")
+USERS = db.collection("users")
 # COMMUNICATIONS = db.collection("Communications")
 # AGENTS = db.collection("Agents")
 # FEEDBACK = db.collection("Feedback")
