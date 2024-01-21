@@ -18,12 +18,14 @@ async def addResponse():
             doc = doc.to_dict()
             responseNum = doc["numResponses"]
             responses = doc["responses"]
+
             res = {'timestamp': data['time'],
                    'numLikes': 0,
                    'response': data['response'],
                    'userEmoji': '🥹',
                    'likedBy': [],
                    'userID': data["userID"]}
+
             responses["response" + str(responseNum)] = res
             doc["numResponses"] = responseNum + 1
 
