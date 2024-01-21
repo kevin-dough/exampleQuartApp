@@ -1,10 +1,48 @@
 from import_reqs import *
 
+
 @app.route("/test")
 async def test():
     doc = QUESTIONS.document("abcdefg").get()
     print(f"data:{doc.to_dict()}")
     return "Hello World"
+
+
+@app.route("/addResponse", methods=["POST"])
+async def addResponse(qid, userID, response, time):
+    data = await request.get_json()
+
+    try:
+        doc_ref = QUESTIONS.document(qid)
+        doc = doc_ref.get()
+        if doc.exists:
+            doc = doc.to_dict()
+            responseNum = doc["numResponses"]
+            responses = doc["responses"]
+            res = {'timestamp': data['time'],
+                   'numLikes': 0,
+                   'response': data['response'],
+                   'userEmoji': '🥹',
+                   'likedBy': [],
+                   'username': data["userID"]}
+            responses["response" + str(responseNum)] = res
+            doc["numResponses"] = responseNum + 1
+
+            doc_ref.set(doc, merge=True)
+
+            return "Success"
+
+        else:
+            return "No such document"
+
+    except Exception as e:
+        print(e)
+        return jsonify(
+            {
+                "success": False,
+                "error": str(e)
+            }
+        ), 500
 
 
 @app.route("/likeResponse/<qid>/<rid>/<uid>", methods=["GET"])
@@ -36,7 +74,7 @@ async def likeResponse(qid, rid, uid):
 
             qdoc_ref.update({
                 "responses": responses
-                
+
             })
 
             return jsonify({
@@ -45,7 +83,6 @@ async def likeResponse(qid, rid, uid):
 
         else:
             return jsonify({"error": "Something not found", "qdoc": qdoc.exists, "udoc": udoc.exists}), 404
-        
 
     except Exception as e:
         print(e)
@@ -55,6 +92,7 @@ async def likeResponse(qid, rid, uid):
                 "error": str(e)
             }
         ), 500
+
 
 @app.route("/unlikeResponse/<qid>/<rid>/<uid>", methods=["GET"])
 async def unlikeResponse(qid, rid, uid):
@@ -85,7 +123,7 @@ async def unlikeResponse(qid, rid, uid):
 
             qdoc_ref.update({
                 "responses": responses
-                
+
             })
 
             return jsonify({
@@ -94,7 +132,6 @@ async def unlikeResponse(qid, rid, uid):
 
         else:
             return jsonify({"error": "Something not found", "qdoc": qdoc.exists, "udoc": udoc.exists}), 404
-        
 
     except Exception as e:
         print(e)
@@ -126,7 +163,6 @@ async def queryQuestion(id):
 
         else:
             return jsonify({"error": "Question not found"}), 404
-        
 
     except Exception as e:
         print(e)
