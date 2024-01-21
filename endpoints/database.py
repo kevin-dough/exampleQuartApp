@@ -23,7 +23,7 @@ async def addResponse():
                    'response': data['response'],
                    'userEmoji': '🥹',
                    'likedBy': [],
-                   'username': data["userID"]}
+                   'userID': data["userID"]}
             responses["response" + str(responseNum)] = res
             doc["numResponses"] = responseNum + 1
 
